@@ -69,6 +69,7 @@ app.patch('/notes/:noteId', async (req: Request, res: Response) => {
   const updatedBody = req.body;
 
   const note = await Note.findByIdAndUpdate(noteId, updatedBody, {new: true})
+  // const note = await Note.findOneAndUpdate({_id: noteId}, updatedBody, {new: true})
   // const note = await Note.updateOne({_id: noteId}, updatedBody, {new: true})
 
   res.status(201).json({
@@ -77,6 +78,20 @@ app.patch('/notes/:noteId', async (req: Request, res: Response) => {
     note
   })
 
+})
+
+app.delete('/notes/:noteId', async (req: Request, res: Response) => {
+  const noteId = req.params.noteId;
+
+  const note = await Note.findByIdAndDelete(noteId);
+  // const note = await Note.findOneAndDelete({_id: noteId});
+  // const note = await Note.deleteOne({_id: noteId});
+
+  res.status(201).json({
+    success: true,
+    message: "Note Deleted Successfully",
+    note
+  })
 })
 
 app.get('/', (req: Request, res:Response) => {
