@@ -4,24 +4,27 @@ import { model, Schema } from "mongoose";
 const app: Application = express();
 app.use(express.json());
 
-const noteSchema = new Schema({
-  title: {type: String, required: true, trim: true},
-  content: {type: String, default: ''},
-  category: {
-    type: String,
-    enum: ['Personal', 'Work', 'Study', 'Othrers'],
-    default: 'Study',
+const noteSchema = new Schema(
+  {
+    title: { type: String, required: true, trim: true },
+    content: { type: String, default: "" },
+    category: {
+      type: String,
+      enum: ["Personal", "Work", "Study", "Othrers"],
+      default: "Study",
+    },
+    pinned: { type: Boolean, default: false },
+    tags: {
+      label: { type: String, required: true },
+      color: { type: String, default: "gray" },
+    },
   },
-  pinned: {type: Boolean, default: false},
-  tags: {
-    label: {type: String, required: true},
-    color: {type: String, default: 'gray'}
-  }
-})
+  { versionKey: false, timestamps: true }
+);
 
 const Note = model("Note", noteSchema);
 
-app.post('/notes/create-note', async (req: Request, res: Response) => {
+app.post("/notes/create-note", async (req: Request, res: Response) => {
   const body = req.body;
   // hard-coded approch
   // const myNote = new Note({
@@ -39,20 +42,20 @@ app.post('/notes/create-note', async (req: Request, res: Response) => {
     success: true,
     message: "Note created successfully",
     note,
-  })
-})
+  });
+});
 
-app.get('/notes', async (req: Request, res: Response) => {
+app.get("/notes", async (req: Request, res: Response) => {
   const notes = await Note.find();
 
   res.status(201).json({
     success: true,
     message: "Get Notes",
-    notes
-  })
-})
+    notes,
+  });
+});
 
-app.get('/notes/:noteId', async (req: Request, res: Response) => {
+app.get("/notes/:noteId", async (req: Request, res: Response) => {
   const noteId = req.params.noteId;
   const note = await Note.findById(noteId);
   // const note = await Note.findOne({_id: noteId})
@@ -60,27 +63,26 @@ app.get('/notes/:noteId', async (req: Request, res: Response) => {
   res.status(201).json({
     success: true,
     message: "Get Single Note",
-    note
-  })
-})
+    note,
+  });
+});
 
-app.patch('/notes/:noteId', async (req: Request, res: Response) => {
+app.patch("/notes/:noteId", async (req: Request, res: Response) => {
   const noteId = req.params.noteId;
   const updatedBody = req.body;
 
-  const note = await Note.findByIdAndUpdate(noteId, updatedBody, {new: true})
+  const note = await Note.findByIdAndUpdate(noteId, updatedBody, { new: true });
   // const note = await Note.findOneAndUpdate({_id: noteId}, updatedBody, {new: true})
   // const note = await Note.updateOne({_id: noteId}, updatedBody, {new: true})
 
   res.status(201).json({
     success: true,
     message: "Note Updated Successfully",
-    note
-  })
+    note,
+  });
+});
 
-})
-
-app.delete('/notes/:noteId', async (req: Request, res: Response) => {
+app.delete("/notes/:noteId", async (req: Request, res: Response) => {
   const noteId = req.params.noteId;
 
   const note = await Note.findByIdAndDelete(noteId);
@@ -90,12 +92,12 @@ app.delete('/notes/:noteId', async (req: Request, res: Response) => {
   res.status(201).json({
     success: true,
     message: "Note Deleted Successfully",
-    note
-  })
-})
+    note,
+  });
+});
 
-app.get('/', (req: Request, res:Response) => {
-  res.send('Welcome to Note App')
-})
+app.get("/", (req: Request, res: Response) => {
+  res.send("Welcome to Note App");
+});
 
 export default app;
