@@ -56,7 +56,12 @@ const userSchema = new Schema<IUser>(
     },
     address: { type: addressSchema },
   },
-  { versionKey: false, timestamps: true }
+  {
+    versionKey: false,
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 
 // instance approch
@@ -92,5 +97,9 @@ userSchema.post("findOneAndDelete", async function (doc, next) {
   }
   next();
 });
+
+userSchema.virtual('fullName').get(function(){
+  return `${this.firstName} ${this.lastName}`
+})
 
 export const User = model<IUser>("User", userSchema);
