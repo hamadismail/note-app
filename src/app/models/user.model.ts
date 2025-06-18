@@ -1,12 +1,7 @@
 import { Model, model, Schema } from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
-import {
-  IAddress,
-  UserInstanceMethod,
-  IUser,
-  UserStaticMethod,
-} from "../interfaces/user.interface";
+import { IAddress, IUser } from "../interfaces/user.interface";
 
 const addressSchema = new Schema<IAddress>(
   {
@@ -17,7 +12,7 @@ const addressSchema = new Schema<IAddress>(
   { _id: false }
 );
 
-const userSchema = new Schema<IUser, UserStaticMethod, UserInstanceMethod>(
+const userSchema = new Schema<IUser>(
   {
     firstName: {
       type: String,
@@ -71,9 +66,17 @@ const userSchema = new Schema<IUser, UserStaticMethod, UserInstanceMethod>(
 // export const User = model("User", userSchema);
 
 // static method approch
-userSchema.static("hashPassword", async function (plainPassword: string) {
-  const password = await bcrypt.hash(plainPassword, 10);
-  return password;
-});
-export const User = model<IUser, UserStaticMethod>("User", userSchema);
+// userSchema.static("hashPassword", async function (plainPassword: string) {
+//   const password = await bcrypt.hash(plainPassword, 10);
+//   return password;
+// });
 
+// pre&post middleware for document create
+userSchema.pre("save", async function () {
+  this.password = await bcrypt.hash(this.password, 10);
+});
+userSchema.post("save", async function (doc) {
+  console.log("%s has been saved", doc._id);
+});
+
+export const User = model<IUser>("User", userSchema);

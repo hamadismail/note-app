@@ -23,8 +23,9 @@ userRoutes.post("/create-user", async (req: Request, res: Response) => {
     const body = await CreateUserZodSchema.parseAsync(req.body);
 
     // static method approch
-    const password = await User.hashPassword(body.password);
-    body.password = password;
+    // const password = await User.hashPassword(body.password);
+    // body.password = password;
+
     const user = await User.create(body);
 
     // instance method approch
