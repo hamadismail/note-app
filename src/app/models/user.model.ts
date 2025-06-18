@@ -2,6 +2,7 @@ import { Model, model, Schema } from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
 import { IAddress, IUser } from "../interfaces/user.interface";
+import { Note } from "./notes.model";
 
 const addressSchema = new Schema<IAddress>(
   {
@@ -71,12 +72,25 @@ const userSchema = new Schema<IUser>(
 //   return password;
 // });
 
-// pre&post middleware for document create
-userSchema.pre("save", async function () {
+// document middleware
+userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
+  next();
 });
-userSchema.post("save", async function (doc) {
-  console.log("%s has been saved", doc._id);
+userSchema.post("save", async function (doc, next) {
+  // console.log("%s has been saved", doc._id);
+  next();
+});
+
+// querry middleware
+userSchema.pre("find", async function (next) {
+  next();
+});
+userSchema.post("findOneAndDelete", async function (doc, next) {
+  if (doc) {
+    await Note.deleteMany({ user: doc._id });
+  }
+  next();
 });
 
 export const User = model<IUser>("User", userSchema);
